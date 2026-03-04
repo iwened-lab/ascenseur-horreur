@@ -1,0 +1,72 @@
+body {
+    background-color: #1a1a1a;
+    color: #00ff41;
+    font-family: 'Courier New', monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+#game-container { text-align: center; width: 300px; }
+
+#floor-display {
+    font-size: 3.5rem;
+    background: #000;
+    border: 4px solid #333;
+    padding: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+}
+
+#elevator-view {
+    position: relative;
+    width: 280px;
+    height: 380px;
+    background: #050505;
+    border: 10px solid #444;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.door {
+    position: absolute;
+    top: 0; width: 50%; height: 100%;
+    background: linear-gradient(90deg, #333, #555, #333);
+    border: 1px solid #222;
+    transition: transform 0.8s cubic-bezier(0.7, 0, 0.3, 1);
+    z-index: 2;
+}
+
+#door-left { left: 0; border-right: 2px solid #111; }
+#door-right { right: 0; border-left: 2px solid #111; }
+
+.open #door-left { transform: translateX(-100%); }
+.open #door-right { transform: translateX(100%); }
+
+#room-content { color: white; padding: 20px; text-align: center; z-index: 1; }
+
+.btn {
+    background: #222; color: #00ff41; border: 2px solid #00ff41;
+    padding: 12px; margin: 5px; cursor: pointer; width: 100%;
+    font-family: inherit; font-weight: bold; transition: 0.2s;
+}
+
+.btn:hover { background: #00ff41; color: black; }
+.action { border-color: #ff4100; color: #ff4100; margin-top: 15px; }
+.action:hover { background: #ff4100; color: white; }
+
+/* --- EFFETS --- */
+.flash-red { animation: flash 0.1s infinite; }
+@keyframes flash { 50% { background-color: #ff0000; } }
+
+#monster-overlay {
+    position: absolute; font-size: 150px; display: none; z-index: 10;
+}
+.monster-attack { display: block !important; animation: zoom 0.5s forwards; }
+@keyframes zoom { 0% { transform: scale(0.1); } 100% { transform: scale(4); } }

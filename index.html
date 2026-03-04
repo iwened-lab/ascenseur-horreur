@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" href="style.css"></head><body>
+<div id="game-container">
+    <div id="floor-display">000</div>
+    
+    <div id="elevator-view">
+        <div id="room-content">
+            <div id="monster-overlay">👹</div>
+            <p id="room-text">L'ascenseur attend...</p>
+        </div>
+        
+        <div id="door-left" class="door"></div>
+        <div id="door-right" class="door"></div>
+    </div>
+    
+    <div id="controls">
+        <button class="btn" onclick="changeFloor(1)">▲ MONTER</button>
+        <button class="btn" onclick="changeFloor(-1)">▼ DESCENDRE</button>
+        <button class="btn action" onclick="toggleDoors()">🚪 OUVRIR L'ÉTAGE</button>
+    </div>
+    <p style="font-size: 10px; color: #555; margin-top: 10px;">Mémorisez la suite pour atteindre l'étage 100.</p>
+</div>
+<script src="script.js"></script></body></html>

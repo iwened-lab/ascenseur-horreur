@@ -3,6 +3,14 @@ let highestClearedLevel = 0;
 let gameState = 'playing';
 let ambianceStarted = false;
 
+// On génère le bon étage pour chaque palier de 3 dès le début
+const safeFloors = {};
+for (let i = 0; i < 100; i += 3) {
+    // Choisit au hasard 1, 2 ou 3 dans chaque groupe
+    const randomSafe = Math.floor(Math.random() * 3) + 1;
+    safeFloors[i] = i + randomSafe;
+}
+
 const elevatorView = document.getElementById('elevator-view');
 const roomText = document.getElementById('room-text');
 const monsterOverlay = document.getElementById('monster-overlay');
@@ -22,7 +30,6 @@ function updateDisplay() {
 function changeFloor(dir) {
     if (gameState !== 'playing') return;
 
-    // LANCE LA MUSIQUE UNE SEULE FOIS (sans reset à chaque étage)
     if (!ambianceStarted) {
         document.getElementById('snd-ambiance').play();
         ambianceStarted = true;
@@ -30,20 +37,19 @@ function changeFloor(dir) {
 
     let targetFloor = currentFloor + dir;
 
-    // SÉCURITÉ PALIER : On ne peut pas monter plus haut que 1 étage au dessus du record
-    if (dir > 0 && targetFloor > highestClearedLevel + 1) {
-        roomText.textContent = "Étage verrouillé ! Validez l'étage " + (highestClearedLevel + 1) + ".";
+    // SÉCURITÉ : On ne peut pas monter au-delà du palier de 3 actuel
+    if (dir > 0 && targetFloor > highestClearedLevel + 3) {
+        roomText.textContent = "Zone bloquée ! Trouvez le bon étage entre " + (highestClearedLevel + 1) + " et " + (highestClearedLevel + 3) + ".";
         return; 
     }
 
-    // On ferme les portes si on bouge
     if (elevatorView.classList.contains('doors-open')) {
         elevatorView.classList.remove('doors-open');
-        // On ne met pas de son ici pour éviter le "bip" à chaque mouvement
     }
 
     currentFloor = Math.max(0, targetFloor);
     updateDisplay();
+    roomText.textContent = "Ascenseur à l'étage " + currentFloor;
 }
 
 function toggleDoors() {
@@ -51,7 +57,7 @@ function toggleDoors() {
     
     if (!elevatorView.classList.contains('doors-open')) {
         elevatorView.classList.add('doors-open');
-        playSnd('snd-doors'); // Le son se joue seulement ici
+        playSnd('snd-doors');
         
         setTimeout(() => {
             checkFloor();
@@ -65,16 +71,23 @@ function checkFloor() {
         return;
     }
 
+    // Si on est dans un étage déjà validé par le passé
     if (currentFloor <= highestClearedLevel) {
-        roomText.textContent = "Déjà sécurisé.";
+        roomText.textContent = "Étage déjà exploré.";
         return;
     }
 
-    if (currentFloor === highestClearedLevel + 1) {
-        highestClearedLevel = currentFloor;
+    // On récupère quel est le bon étage pour le palier actuel (0, 3, 6...)
+    const palierBase = Math.floor((currentFloor - 1) / 3) * 3;
+    const correctFloor = safeFloors[palierBase];
+
+    if (currentFloor === correctFloor) {
+        // VICTOIRE DU PALIER
+        highestClearedLevel = palierBase + 3; 
         playSnd('snd-success');
-        roomText.textContent = "ÉTAGE " + currentFloor + " SÉCURISÉ !";
+        roomText.textContent = "ÉTAGE SÉCURISÉ ! Le palier suivant est débloqué.";
     } else {
+        // MONSTRE !
         triggerJumpscare();
     }
 }
@@ -90,7 +103,7 @@ function triggerJumpscare() {
         currentFloor = 0;
         updateDisplay();
         gameState = 'playing';
-        roomText.textContent = "L'ascenseur redémarre...";
+        roomText.textContent = "L'ascenseur redémarre au niveau 0.";
     }, 4000);
 }
 

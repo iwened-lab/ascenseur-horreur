@@ -15,14 +15,17 @@
 
     <div id="game-container">
         <div id="floor-display">000</div>
+        
         <div id="elevator-view">
             <div id="room-content">
                 <img id="monster-overlay" src="monster.png" alt="Monstre">
-                <p id="room-text">Clique sur un bouton pour commencer...</p>
+                <p id="room-text">Appuyez sur monter pour démarrer...</p>
             </div>
+            
             <div id="door-left" class="door"></div>
             <div id="door-right" class="door"></div>
         </div>
+        
         <div id="controls">
             <button class="btn" onclick="changeFloor(1)">▲ MONTER</button>
             <button class="btn" onclick="changeFloor(-1)">▼ DESCENDRE</button>

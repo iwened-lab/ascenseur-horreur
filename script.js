@@ -2,7 +2,7 @@ let currentFloor = 0;
 let highestClearedLevel = 0;
 let gameState = 'playing';
 
-// Génère la liste des étages sûrs
+// Un bon étage par bloc de 3
 const safeFloors = {};
 for (let i = 0; i < 100; i += 3) {
     safeFloors[i] = i + (Math.floor(Math.random() * 3) + 1);
@@ -15,8 +15,9 @@ const policeTape = document.getElementById('police-tape');
 
 function startGame() {
     document.getElementById('story-overlay').style.display = 'none';
-    document.getElementById('snd-ambiance').play();
-    roomText.textContent = "Trouve tes parents...";
+    const bgMusic = document.getElementById('snd-ambiance');
+    if (bgMusic) bgMusic.play();
+    roomText.textContent = "Trouve la sortie...";
 }
 
 function playSnd(id) {
@@ -26,8 +27,12 @@ function playSnd(id) {
 
 function updateDisplay() {
     document.getElementById('floor-display').textContent = currentFloor.toString().padStart(3, '0');
+    
+    // Si déjà validé, on affiche les rubans mais SEULEMENT si les portes sont fermées
     if (currentFloor > 0 && currentFloor <= highestClearedLevel) {
-        policeTape.style.display = 'block';
+        if (!elevatorView.classList.contains('doors-open')) {
+            policeTape.style.display = 'block';
+        }
     } else {
         policeTape.style.display = 'none';
     }
@@ -36,18 +41,33 @@ function updateDisplay() {
 function changeFloor(dir) {
     if (gameState !== 'playing') return;
     let target = currentFloor + dir;
+
     if (dir > 0 && target > highestClearedLevel + 3) {
-        roomText.textContent = "Palier verrouillé !";
+        roomText.textContent = "Palier bloqué !";
         return; 
     }
-    if (elevatorView.classList.contains('doors-open')) elevatorView.classList.remove('doors-open');
+
+    // On cache les rubans pendant le mouvement
+    policeTape.style.display = 'none';
+
+    if (elevatorView.classList.contains('doors-open')) {
+        elevatorView.classList.remove('doors-open');
+    }
+
     currentFloor = Math.max(0, target);
-    updateDisplay();
+    
+    // On attend la fermeture pour rafraîchir les rubans
+    setTimeout(() => { updateDisplay(); }, 500);
 }
 
 function toggleDoors() {
     if (gameState !== 'playing' || currentFloor === 0) return;
-    if (policeTape.style.display === 'block') return;
+    
+    // Bloqué si zone condamnée
+    if (currentFloor <= highestClearedLevel) {
+        roomText.textContent = "Cette porte est scellée.";
+        return;
+    }
 
     if (!elevatorView.classList.contains('doors-open')) {
         elevatorView.classList.add('doors-open');
@@ -61,8 +81,7 @@ function checkFloor() {
     if (currentFloor === safeFloors[palierBase]) {
         highestClearedLevel = palierBase + 3; 
         playSnd('snd-success');
-        roomText.textContent = "ÉTAGE SÉCURISÉ.";
-        policeTape.style.display = 'block';
+        roomText.textContent = "ÉTAGE SÉCURISÉ !";
     } else {
         triggerJumpscare();
     }

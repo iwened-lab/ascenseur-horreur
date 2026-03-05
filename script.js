@@ -25,7 +25,6 @@ function playSnd(id) {
 
 function updateDisplay() {
     document.getElementById('floor-display').textContent = currentFloor.toString().padStart(3, '0');
-    // Rubans seulement si étage déjà fait
     if (currentFloor > 0 && currentFloor <= highestClearedLevel) {
         policeTape.style.display = 'block';
     } else {
@@ -44,20 +43,18 @@ function changeFloor(dir) {
     gameState = 'moving';
     elevatorView.classList.remove('doors-open');
     
-    // 1. Les portes actuelles s'en vont
+    // Animation : les portes s'en vont
     movingPart.classList.add(dir > 0 ? 'slide-up' : 'slide-down');
 
     setTimeout(() => {
-        // 2. On change l'étage en secret quand elles sont invisibles
         currentFloor = Math.max(0, target);
         updateDisplay();
         
-        // 3. On les replace de l'AUTRE côté instantanément
+        // Reset position sans animation (pour revenir de l'autre côté)
         movingPart.style.transition = 'none';
         movingPart.classList.remove('slide-up', 'slide-down');
         movingPart.classList.add(dir > 0 ? 'slide-down' : 'slide-up');
         
-        // 4. On les fait revenir vers le centre
         setTimeout(() => {
             movingPart.style.transition = 'transform 0.6s ease-in-out';
             movingPart.classList.remove('slide-up', 'slide-down');
@@ -70,7 +67,7 @@ function changeFloor(dir) {
 function toggleDoors() {
     if (gameState !== 'playing' || currentFloor === 0) return;
     if (currentFloor <= highestClearedLevel) {
-        roomText.textContent = "Zone scellée.";
+        roomText.textContent = "Porte scellée.";
         return;
     }
 
@@ -86,7 +83,7 @@ function checkFloor() {
     if (currentFloor === safeFloors[palierBase]) {
         highestClearedLevel = palierBase + 3; 
         playSnd('snd-success');
-        roomText.textContent = "SÉCURISÉ !";
+        roomText.textContent = "ÉTAGE SÉCURISÉ !";
     } else {
         triggerJumpscare();
     }
@@ -102,7 +99,7 @@ function triggerJumpscare() {
         currentFloor = 0;
         updateDisplay();
         gameState = 'playing';
-        roomText.textContent = "L'ascenseur est retombé...";
+        roomText.textContent = "Retour au RDC...";
     }, 4000);
 }
 

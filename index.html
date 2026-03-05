@@ -3,19 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>Ascenseur Horreur - Le Jeu de Mémoire de iwened-lab</title>
-
-    <meta name="description" content="Arriverez-vous à l'étage 100 ? Un jeu d'ascenseur terrifiant par iwened-lab.">
+    <title>Ascenseur Horreur - iwened-lab</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <audio id="snd-ambiance" src="ambiance.mp3" loop></audio>
+    <audio id="snd-jumpscare" src="jumpscare.mp3"></audio>
+    <audio id="snd-success" src="success.mp3"></audio>
+    <audio id="snd-doors" src="doors.mp3"></audio>
+
     <div id="game-container">
         <div id="floor-display">000</div>
         <div id="elevator-view">
             <div id="room-content">
-                <div id="monster-overlay">👹</div>
-                <p id="room-text">L'ascenseur attend...</p>
+                <img id="monster-overlay" src="monstre.png" alt="Monstre">
+                <p id="room-text">Clique sur monter pour commencer...</p>
             </div>
             <div id="door-left" class="door"></div>
             <div id="door-right" class="door"></div>
@@ -23,10 +26,10 @@
         <div id="controls">
             <button class="btn" onclick="changeFloor(1)">▲ MONTER</button>
             <button class="btn" onclick="changeFloor(-1)">▼ DESCENDRE</button>
-            <button class="btn action" onclick="toggleDoors()">🚪 OUVRIR L'ÉTAGE</button>
+            <button class="btn action" onclick="toggleDoors()">🚪 OUVRIR</button>
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
-

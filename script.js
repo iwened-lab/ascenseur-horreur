@@ -1,6 +1,7 @@
 let currentFloor = 0;
 let highestClearedLevel = 0;
 let gameState = 'playing';
+let ambianceStarted = false;
 
 const elevatorView = document.getElementById('elevator-view');
 const roomText = document.getElementById('room-text');
@@ -21,20 +22,26 @@ function updateDisplay() {
 function changeFloor(dir) {
     if (gameState !== 'playing') return;
 
+    // LANCE LA MUSIQUE UNE SEULE FOIS (sans reset à chaque étage)
+    if (!ambianceStarted) {
+        document.getElementById('snd-ambiance').play();
+        ambianceStarted = true;
+    }
+
     let targetFloor = currentFloor + dir;
 
-    // SÉCURITÉ PALIER : Empêche de monter plus haut que le prochain étage à valider
+    // SÉCURITÉ PALIER : On ne peut pas monter plus haut que 1 étage au dessus du record
     if (dir > 0 && targetFloor > highestClearedLevel + 1) {
-        roomText.textContent = "Étage verrouillé ! Validez d'abord l'étage précédent.";
+        roomText.textContent = "Étage verrouillé ! Validez l'étage " + (highestClearedLevel + 1) + ".";
         return; 
     }
 
+    // On ferme les portes si on bouge
     if (elevatorView.classList.contains('doors-open')) {
         elevatorView.classList.remove('doors-open');
-        playSnd('snd-doors');
+        // On ne met pas de son ici pour éviter le "bip" à chaque mouvement
     }
 
-    playSnd('snd-ambiance');
     currentFloor = Math.max(0, targetFloor);
     updateDisplay();
 }
@@ -44,26 +51,25 @@ function toggleDoors() {
     
     if (!elevatorView.classList.contains('doors-open')) {
         elevatorView.classList.add('doors-open');
-        playSnd('snd-doors');
+        playSnd('snd-doors'); // Le son se joue seulement ici
         
         setTimeout(() => {
             checkFloor();
-        }, 1000);
+        }, 800);
     }
 }
 
 function checkFloor() {
     if (currentFloor === 0) {
-        roomText.textContent = "Rez-de-chaussée. Prêt à monter ?";
+        roomText.textContent = "Rez-de-chaussée.";
         return;
     }
 
     if (currentFloor <= highestClearedLevel) {
-        roomText.textContent = "Étage déjà sécurisé.";
+        roomText.textContent = "Déjà sécurisé.";
         return;
     }
 
-    // Le bon chemin (1 par 1)
     if (currentFloor === highestClearedLevel + 1) {
         highestClearedLevel = currentFloor;
         playSnd('snd-success');
@@ -81,13 +87,11 @@ function triggerJumpscare() {
     setTimeout(() => {
         monsterOverlay.classList.remove('monster-attack');
         elevatorView.classList.remove('doors-open');
-        playSnd('snd-doors');
         currentFloor = 0;
         updateDisplay();
         gameState = 'playing';
         roomText.textContent = "L'ascenseur redémarre...";
-    }, 3000);
+    }, 4000);
 }
 
 updateDisplay();
-

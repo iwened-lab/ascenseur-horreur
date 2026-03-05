@@ -11,36 +11,29 @@ body { display: flex; justify-content: center; align-items: center; min-height: 
 
 #elevator-view { flex-grow: 1; background-color: #000; position: relative; overflow: hidden; margin-bottom: 20px; border: 2px solid #222; }
 
-/* Le groupe Portes + Rubans qui bouge */
-#moving-part {
-    position: absolute; width: 100%; height: 100%;
-    transition: transform 0.6s ease-in-out;
-    z-index: 5;
-}
-
-/* Animations de mouvement */
+/* Animation du bloc portes + rubans */
+#moving-part { position: absolute; width: 100%; height: 100%; transition: transform 0.6s ease-in-out; z-index: 5; }
 .slide-up { transform: translateY(-100%); }
 .slide-down { transform: translateY(100%); }
 
-/* PORTES */
 .door { position: absolute; top: 0; width: 50%; height: 100%; background-color: #252525; border: 1px solid #111; transition: transform 0.8s ease-in-out; }
 #door-left { left: 0; border-right: 1px solid #000; }
 #door-right { right: 0; border-left: 1px solid #000; }
-
 .doors-open #door-left { transform: translateX(-100%); }
 .doors-open #door-right { transform: translateX(100%); }
 
-/* RUBANS (attachés aux portes) */
-#police-tape { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; display: none; z-index: 6; }
-.tape { position: absolute; width: 160%; height: 40px; background: repeating-linear-gradient(45deg, #f1c40f, #f1c40f 20px, #000 20px, #000 40px); color: #000; font-weight: bold; font-size: 12px; line-height: 40px; text-align: center; border: 2px solid #000; }
+/* RUBANS EN CROIX */
+#police-tape { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; display: none; z-index: 10; }
+.tape { position: absolute; width: 160%; height: 40px; background: repeating-linear-gradient(45deg, #f1c40f, #f1c40f 20px, #000 20px, #000 40px); color: #000; font-weight: bold; font-size: 11px; line-height: 40px; text-align: center; border: 2px solid #000; }
 .tape-1 { top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(25deg); }
 .tape-2 { top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-25deg); }
 
-/* MONSTRE (Tout devant) */
+/* MONSTRE (Priorité max) */
 #monster-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: none; z-index: 50; }
 .monster-attack { display: block !important; animation: zoom 0.2s ease-out forwards; }
 @keyframes zoom { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1.1); opacity: 1; } }
 
-#room-text { position: absolute; bottom: 10px; width: 100%; text-align: center; z-index: 40; font-size: 14px; color: #0f0; }
+#room-text { position: absolute; bottom: 10px; width: 100%; text-align: center; z-index: 40; color: #0f0; }
 .btn { background-color: #222; color: #fff; border: 1px solid #444; padding: 15px; cursor: pointer; flex: 1; font-family: inherit; }
 .btn.action { background-color: #300; width: 100%; font-weight: bold; }
+

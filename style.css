@@ -7,26 +7,36 @@ body { display: flex; justify-content: center; align-items: center; min-height: 
 h1 { color: #eee; font-size: 24px; margin-bottom: 20px; letter-spacing: 8px; }
 #story-text { font-size: 15px; line-height: 1.6; margin-bottom: 25px; color: #bbb; }
 .author-line { color: #ff0000; font-size: 12px; font-weight: bold; margin-bottom: 25px; text-transform: uppercase; }
-#start-btn { background-color: #eee; color: #000; border: none; padding: 12px 30px; font-weight: bold; cursor: pointer; }
+#start-btn { background-color: #eee; color: #000; border: none; padding: 12px 30px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+#start-btn:hover { background-color: #ff0000; color: #fff; }
 
 /* JEU */
 #game-container { width: 320px; height: 550px; background-color: #111; border: 3px solid #222; padding: 20px; display: flex; flex-direction: column; }
 #floor-display { background-color: #000; color: #0f0; font-size: 40px; text-align: center; padding: 10px; margin-bottom: 20px; border: 1px solid #333; }
 #elevator-view { flex-grow: 1; background-color: #151515; position: relative; overflow: hidden; margin-bottom: 20px; border: 2px solid #222; }
-#room-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; position: relative; text-align: center; }
+#room-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
 
-/* RUBANS */
-#police-tape { position: absolute; width: 100%; height: 100%; display: none; z-index: 8; }
-.tape { position: absolute; width: 150%; height: 25px; background: repeating-linear-gradient(45deg, #f1c40f, #f1c40f 20px, #000 20px, #000 40px); color: #000; font-weight: bold; font-size: 10px; line-height: 25px; text-align: center; }
-.tape-1 { transform: rotate(30deg) translate(-10%, 80px); }
-.tape-2 { transform: rotate(-30deg) translate(-10%, -80px); }
+/* RUBANS EN CROIX AU MILIEU */
+#police-tape { 
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 100%; height: 100%; display: none; z-index: 20; pointer-events: none; 
+}
+.tape { 
+    position: absolute; width: 160%; height: 40px; 
+    background: repeating-linear-gradient(45deg, #f1c40f, #f1c40f 20px, #000 20px, #000 40px);
+    color: #000; font-weight: bold; font-size: 14px; line-height: 40px; text-align: center;
+    border: 2px solid #000; box-shadow: 0 0 15px rgba(0,0,0,0.7);
+}
+.tape-1 { top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(25deg); }
+.tape-2 { top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-25deg); }
 
 /* MONSTRE & PORTES */
 #monster-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: none; z-index: 10; }
 .monster-attack { display: block !important; animation: zoom 0.2s ease-out forwards; }
 @keyframes zoom { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1.1); opacity: 1; } }
 .door { position: absolute; top: 0; width: 50%; height: 100%; background-color: #252525; border: 1px solid #111; transition: transform 0.8s ease-in-out; z-index: 5; }
-#door-left { left: 0; } #door-right { right: 0; }
+#door-left { left: 0; border-right: 1px solid #000; }
+#door-right { right: 0; border-left: 1px solid #000; }
 .doors-open #door-left { transform: translateX(-100%); }
 .doors-open #door-right { transform: translateX(100%); }
 
@@ -34,3 +44,4 @@ h1 { color: #eee; font-size: 24px; margin-bottom: 20px; letter-spacing: 8px; }
 .btn-group { display: flex; gap: 5px; margin-bottom: 5px; }
 .btn { background-color: #222; color: #fff; border: 1px solid #444; padding: 15px; cursor: pointer; flex: 1; font-family: inherit; }
 .btn.action { background-color: #300; width: 100%; font-weight: bold; border-color: #500; }
+

@@ -7,7 +7,7 @@ for (let i = 0; i < 100; i += 3) {
     safeFloors[i] = i + (Math.floor(Math.random() * 3) + 1);
 }
 
-const movingWalls = document.getElementById('moving-walls');
+const movingPart = document.getElementById('moving-part');
 const elevatorView = document.getElementById('elevator-view');
 const roomText = document.getElementById('room-text');
 const monsterOverlay = document.getElementById('monster-overlay');
@@ -25,7 +25,7 @@ function playSnd(id) {
 
 function updateDisplay() {
     document.getElementById('floor-display').textContent = currentFloor.toString().padStart(3, '0');
-    // Rubans seulement si étage déjà validé et portes fermées
+    // Rubans seulement si étage déjà fait
     if (currentFloor > 0 && currentFloor <= highestClearedLevel) {
         policeTape.style.display = 'block';
     } else {
@@ -41,20 +41,29 @@ function changeFloor(dir) {
         return; 
     }
     
-    // Fermer les portes si elles étaient ouvertes
+    gameState = 'moving';
     elevatorView.classList.remove('doors-open');
     
-    // Activer l'animation de mouvement
-    const moveClass = dir > 0 ? 'moving-up' : 'moving-down';
-    movingWalls.classList.add(moveClass);
-    roomText.textContent = dir > 0 ? "Montée..." : "Descente...";
+    // 1. Les portes actuelles s'en vont
+    movingPart.classList.add(dir > 0 ? 'slide-up' : 'slide-down');
 
-    // Simuler le temps de trajet
     setTimeout(() => {
-        movingWalls.classList.remove('moving-up', 'moving-down');
+        // 2. On change l'étage en secret quand elles sont invisibles
         currentFloor = Math.max(0, target);
         updateDisplay();
-        roomText.textContent = "Étage " + currentFloor;
+        
+        // 3. On les replace de l'AUTRE côté instantanément
+        movingPart.style.transition = 'none';
+        movingPart.classList.remove('slide-up', 'slide-down');
+        movingPart.classList.add(dir > 0 ? 'slide-down' : 'slide-up');
+        
+        // 4. On les fait revenir vers le centre
+        setTimeout(() => {
+            movingPart.style.transition = 'transform 0.6s ease-in-out';
+            movingPart.classList.remove('slide-up', 'slide-down');
+            gameState = 'playing';
+            roomText.textContent = "Étage " + currentFloor;
+        }, 50);
     }, 600);
 }
 
@@ -77,8 +86,7 @@ function checkFloor() {
     if (currentFloor === safeFloors[palierBase]) {
         highestClearedLevel = palierBase + 3; 
         playSnd('snd-success');
-        roomText.textContent = "ÉTAGE SÉCURISÉ !";
-        // On n'affiche pas les rubans tout de suite pour ne pas gêner la vue
+        roomText.textContent = "SÉCURISÉ !";
     } else {
         triggerJumpscare();
     }

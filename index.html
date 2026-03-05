@@ -3,10 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ascenseur Horreur - iwened-lab</title>
+    <title>Ascenseur Horreur - par iwened</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <div id="story-overlay">
+        <div id="story-box">
+            <h1>L'ASCENSEUR</h1>
+            <div id="story-text">
+                <p>Tu es coincé dans un bâtiment étrange. Pour sortir, tu dois atteindre l'étage 100, mais certaines portes sont mauvaises et les monstres ne sont jamais loin...</p>
+            </div>
+            <p class="author-line">Ce jeu est écrit par iwened</p>
+            <button id="start-btn" onclick="startGame()">COMMENCER</button>
+        </div>
+    </div>
 
     <audio id="snd-ambiance" src="ambiance.mp3.mp3" loop></audio>
     <audio id="snd-jumpscare" src="jumpscare.mp3.mp3"></audio>
@@ -18,18 +29,23 @@
         
         <div id="elevator-view">
             <div id="room-content">
+                <div id="police-tape">
+                    <div class="tape tape-1">ZONE CONDAMNÉE</div>
+                    <div class="tape tape-2">ZONE CONDAMNÉE</div>
+                </div>
                 <img id="monster-overlay" src="monster.png" alt="Monstre">
-                <p id="room-text">Appuyez sur monter pour démarrer...</p>
+                <p id="room-text">Appuyez sur "COMMENCER"</p>
             </div>
-            
             <div id="door-left" class="door"></div>
             <div id="door-right" class="door"></div>
         </div>
         
         <div id="controls">
-            <button class="btn" onclick="changeFloor(1)">▲ MONTER</button>
-            <button class="btn" onclick="changeFloor(-1)">▼ DESCENDRE</button>
-            <button class="btn action" onclick="toggleDoors()">🚪 OUVRIR</button>
+            <div class="btn-group">
+                <button class="btn" onclick="changeFloor(1)">▲ MONTER</button>
+                <button class="btn" onclick="changeFloor(-1)">▼ DESCENDRE</button>
+            </div>
+            <button class="btn action" onclick="toggleDoors()">🚪 OUVRIR L'ÉTAGE</button>
         </div>
     </div>
 

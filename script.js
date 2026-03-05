@@ -2,12 +2,12 @@ let currentFloor = 0;
 let highestClearedLevel = 0;
 let gameState = 'playing';
 
-// Un bon étage par bloc de 3
 const safeFloors = {};
 for (let i = 0; i < 100; i += 3) {
     safeFloors[i] = i + (Math.floor(Math.random() * 3) + 1);
 }
 
+const movingWalls = document.getElementById('moving-walls');
 const elevatorView = document.getElementById('elevator-view');
 const roomText = document.getElementById('room-text');
 const monsterOverlay = document.getElementById('monster-overlay');
@@ -15,9 +15,7 @@ const policeTape = document.getElementById('police-tape');
 
 function startGame() {
     document.getElementById('story-overlay').style.display = 'none';
-    const bgMusic = document.getElementById('snd-ambiance');
-    if (bgMusic) bgMusic.play();
-    roomText.textContent = "Trouve la sortie...";
+    document.getElementById('snd-ambiance').play();
 }
 
 function playSnd(id) {
@@ -27,12 +25,9 @@ function playSnd(id) {
 
 function updateDisplay() {
     document.getElementById('floor-display').textContent = currentFloor.toString().padStart(3, '0');
-    
-    // Si déjà validé, on affiche les rubans mais SEULEMENT si les portes sont fermées
+    // Rubans seulement si étage déjà validé et portes fermées
     if (currentFloor > 0 && currentFloor <= highestClearedLevel) {
-        if (!elevatorView.classList.contains('doors-open')) {
-            policeTape.style.display = 'block';
-        }
+        policeTape.style.display = 'block';
     } else {
         policeTape.style.display = 'none';
     }
@@ -41,31 +36,32 @@ function updateDisplay() {
 function changeFloor(dir) {
     if (gameState !== 'playing') return;
     let target = currentFloor + dir;
-
     if (dir > 0 && target > highestClearedLevel + 3) {
         roomText.textContent = "Palier bloqué !";
         return; 
     }
-
-    // On cache les rubans pendant le mouvement
-    policeTape.style.display = 'none';
-
-    if (elevatorView.classList.contains('doors-open')) {
-        elevatorView.classList.remove('doors-open');
-    }
-
-    currentFloor = Math.max(0, target);
     
-    // On attend la fermeture pour rafraîchir les rubans
-    setTimeout(() => { updateDisplay(); }, 500);
+    // Fermer les portes si elles étaient ouvertes
+    elevatorView.classList.remove('doors-open');
+    
+    // Activer l'animation de mouvement
+    const moveClass = dir > 0 ? 'moving-up' : 'moving-down';
+    movingWalls.classList.add(moveClass);
+    roomText.textContent = dir > 0 ? "Montée..." : "Descente...";
+
+    // Simuler le temps de trajet
+    setTimeout(() => {
+        movingWalls.classList.remove('moving-up', 'moving-down');
+        currentFloor = Math.max(0, target);
+        updateDisplay();
+        roomText.textContent = "Étage " + currentFloor;
+    }, 600);
 }
 
 function toggleDoors() {
     if (gameState !== 'playing' || currentFloor === 0) return;
-    
-    // Bloqué si zone condamnée
     if (currentFloor <= highestClearedLevel) {
-        roomText.textContent = "Cette porte est scellée.";
+        roomText.textContent = "Zone scellée.";
         return;
     }
 
@@ -82,6 +78,7 @@ function checkFloor() {
         highestClearedLevel = palierBase + 3; 
         playSnd('snd-success');
         roomText.textContent = "ÉTAGE SÉCURISÉ !";
+        // On n'affiche pas les rubans tout de suite pour ne pas gêner la vue
     } else {
         triggerJumpscare();
     }
@@ -97,7 +94,7 @@ function triggerJumpscare() {
         currentFloor = 0;
         updateDisplay();
         gameState = 'playing';
-        roomText.textContent = "Retour au RDC...";
+        roomText.textContent = "L'ascenseur est retombé...";
     }, 4000);
 }
 

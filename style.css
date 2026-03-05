@@ -1,142 +1,70 @@
-/* RESET DE BASE */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { 
+    display: flex; justify-content: center; align-items: center; 
+    min-height: 100vh; background-color: #050505; 
+    font-family: 'Courier New', monospace; color: #eee; overflow: hidden; 
 }
 
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #050505;
-    font-family: 'Courier New', monospace;
-    color: #eee;
-    overflow: hidden; /* Empêche le scroll inutile */
+/* POP-UP ACCUEIL */
+#story-overlay { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background-color: rgba(0, 0, 0, 0.98); display: flex; 
+    justify-content: center; align-items: center; z-index: 100; 
 }
 
-#game-container {
-    width: 320px;
-    height: 550px;
-    background-color: #111;
-    border: 3px solid #222;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+#story-box { 
+    width: 90%; max-width: 400px; background-color: #111; 
+    border: 2px solid #333; padding: 30px; text-align: center;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.1);
 }
 
-#floor-display {
-    background-color: #000;
-    color: #0f0;
-    font-size: 35px;
-    text-align: center;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 2px solid #333;
-    text-shadow: 0 0 5px #0f0;
+h1 { color: #eee; font-size: 24px; margin-bottom: 20px; letter-spacing: 8px; }
+
+#story-text { font-size: 15px; line-height: 1.6; margin-bottom: 25px; color: #bbb; }
+
+.author-line { color: #ff0000; font-size: 12px; font-weight: bold; margin-bottom: 25px; text-transform: uppercase; }
+
+#start-btn { 
+    background-color: #eee; color: #000; border: none; 
+    padding: 12px 30px; font-family: inherit; font-weight: bold; 
+    cursor: pointer; transition: 0.3s; 
 }
+#start-btn:hover { background-color: #ff0000; color: #fff; }
 
-#elevator-view {
-    flex-grow: 1;
-    background-color: #1a1a1a;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 20px;
-    border: 2px solid #222;
+/* JEU */
+#game-container { width: 320px; height: 550px; background-color: #111; border: 3px solid #222; padding: 20px; display: flex; flex-direction: column; }
+
+#floor-display { background-color: #000; color: #0f0; font-size: 40px; text-align: center; padding: 10px; margin-bottom: 20px; border: 1px solid #333; }
+
+#elevator-view { flex-grow: 1; background-color: #151515; position: relative; overflow: hidden; margin-bottom: 20px; border: 2px solid #222; }
+
+#room-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; position: relative; text-align: center; padding: 10px; }
+
+/* RUBANS POLICE */
+#police-tape { position: absolute; width: 100%; height: 100%; display: none; z-index: 8; pointer-events: none; }
+.tape { 
+    position: absolute; width: 150%; height: 25px; 
+    background: repeating-linear-gradient(45deg, #f1c40f, #f1c40f 20px, #000 20px, #000 40px);
+    color: #000; font-weight: bold; font-size: 10px; line-height: 25px; text-align: center; 
 }
+.tape-1 { transform: rotate(30deg) translate(-10%, 80px); }
+.tape-2 { transform: rotate(-30deg) translate(-10%, -80px); }
 
-#room-content {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-}
+/* MONSTRE */
+#monster-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: none; z-index: 10; }
+.monster-attack { display: block !important; animation: j-zoom 0.2s ease-out forwards; }
+@keyframes j-zoom { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1.1); opacity: 1; } }
 
-#room-text {
-    font-size: 14px;
-    padding: 10px;
-    color: #ccc;
-    z-index: 1;
-}
-
-/* LE MONSTRE */
-#monster-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: none;
-    z-index: 10;
-}
-
-/* L'animation quand le monstre attaque */
-.monster-attack {
-    display: block !important;
-    animation: jumpscare-zoom 0.2s ease-out forwards;
-}
-
-@keyframes jumpscare-zoom {
-    0% { transform: scale(0.5); opacity: 0; }
-    100% { transform: scale(1.2); opacity: 1; }
-}
-
-/* LES PORTES */
-.door {
-    position: absolute;
-    top: 0;
-    width: 50%;
-    height: 100%;
-    background-color: #333;
-    border: 1px solid #111;
-    transition: transform 0.8s ease-in-out;
-    z-index: 5;
-    /* Petit effet de métal sur les portes */
-    background-image: linear-gradient(90deg, #333 0%, #444 50%, #333 100%);
-}
-
-#door-left { left: 0; border-right: 2px solid #222; }
-#door-right { right: 0; border-left: 2px solid #222; }
-
-/* Ouverture */
+/* PORTES */
+.door { position: absolute; top: 0; width: 50%; height: 100%; background-color: #252525; border: 1px solid #111; transition: transform 0.8s ease-in-out; z-index: 5; }
+#door-left { left: 0; border-right: 1px solid #000; }
+#door-right { right: 0; border-left: 1px solid #000; }
 .doors-open #door-left { transform: translateX(-100%); }
 .doors-open #door-right { transform: translateX(100%); }
 
 /* BOUTONS */
-#controls {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.btn-group {
-    display: flex;
-    gap: 10px;
-}
-
-.btn {
-    flex: 1;
-    background-color: #222;
-    color: #fff;
-    border: 1px solid #444;
-    padding: 15px;
-    font-family: inherit;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.btn:hover { background-color: #333; }
-.btn:active { background-color: #000; }
-
-.btn.action {
-    background-color: #400;
-    border-color: #600;
-}
-
-.btn.action:hover { background-color: #600; }
+.btn-group { display: flex; gap: 5px; margin-bottom: 5px; }
+.btn { background-color: #222; color: #fff; border: 1px solid #444; padding: 15px; cursor: pointer; flex: 1; font-family: inherit; }
+.btn.action { background-color: #300; border-color: #500; font-weight: bold; }
+.btn.action:hover { background-color: #500; }

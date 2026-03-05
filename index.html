@@ -12,7 +12,7 @@
         <div id="story-box">
             <h1>L'ASCENSEUR</h1>
             <div id="story-text">
-                <p>Tu es coincé dans un bâtiment étrange. Pour sortir, tu dois atteindre l'étage 100, mais certaines portes sont mauvaises et les monstres ne sont jamais loin...</p>
+                <p>Tu es coincé dans un bâtiment étrange. Atteins l'étage 100. Attention aux monstres...</p>
             </div>
             <p class="author-line">Ce jeu est écrit par iwened</p>
             <button id="start-btn" onclick="startGame()">COMMENCER</button>
@@ -28,18 +28,19 @@
         <div id="floor-display">000</div>
         
         <div id="elevator-view">
-            <div id="moving-walls"></div>
+            <div id="shaft-bg"></div>
 
-            <div id="room-content">
+            <div id="moving-part">
                 <div id="police-tape">
                     <div class="tape tape-1">ZONE CONDAMNÉE</div>
                     <div class="tape tape-2">ZONE CONDAMNÉE</div>
                 </div>
-                <img id="monster-overlay" src="monster.png" alt="Monstre">
-                <p id="room-text">Prêt ?</p>
+                <div id="door-left" class="door"></div>
+                <div id="door-right" class="door"></div>
             </div>
-            <div id="door-left" class="door"></div>
-            <div id="door-right" class="door"></div>
+
+            <img id="monster-overlay" src="monster.png" alt="Monstre">
+            <p id="room-text">En attente...</p>
         </div>
         
         <div id="controls">

@@ -1,45 +1,51 @@
 let currentFloor = 0;
 let highestClearedLevel = 0;
 let gameState = 'playing';
-let ambianceStarted = false;
 
-// On génère le bon étage pour chaque palier de 3 dès le début
+// Génération aléatoire : 1 bon étage par bloc de 3
 const safeFloors = {};
 for (let i = 0; i < 100; i += 3) {
-    // Choisit au hasard 1, 2 ou 3 dans chaque groupe
-    const randomSafe = Math.floor(Math.random() * 3) + 1;
-    safeFloors[i] = i + randomSafe;
+    safeFloors[i] = i + (Math.floor(Math.random() * 3) + 1);
 }
 
 const elevatorView = document.getElementById('elevator-view');
 const roomText = document.getElementById('room-text');
 const monsterOverlay = document.getElementById('monster-overlay');
+const policeTape = document.getElementById('police-tape');
+
+// LANCE LE JEU
+function startGame() {
+    document.getElementById('story-overlay').style.display = 'none';
+    const bgMusic = document.getElementById('snd-ambiance');
+    if (bgMusic) bgMusic.play();
+    roomText.textContent = "Trouvez le bon étage...";
+}
 
 function playSnd(id) {
     const audio = document.getElementById(id);
-    if (audio) {
-        audio.currentTime = 0;
-        audio.play().catch(() => {});
-    }
+    if (audio) { audio.currentTime = 0; audio.play().catch(() => {}); }
 }
 
 function updateDisplay() {
     document.getElementById('floor-display').textContent = currentFloor.toString().padStart(3, '0');
+    
+    // Si l'étage appartient à un palier déjà validé
+    if (currentFloor > 0 && currentFloor <= highestClearedLevel) {
+        policeTape.style.display = 'block';
+        roomText.textContent = "ZONE SÉCURISÉE / CONDAMNÉE";
+    } else {
+        policeTape.style.display = 'none';
+        if (currentFloor > 0) roomText.textContent = "Étage " + currentFloor;
+    }
 }
 
 function changeFloor(dir) {
     if (gameState !== 'playing') return;
-
-    if (!ambianceStarted) {
-        document.getElementById('snd-ambiance').play();
-        ambianceStarted = true;
-    }
-
     let targetFloor = currentFloor + dir;
 
-    // SÉCURITÉ : On ne peut pas monter au-delà du palier de 3 actuel
+    // Blocage si on tente de dépasser le palier actuel
     if (dir > 0 && targetFloor > highestClearedLevel + 3) {
-        roomText.textContent = "Zone bloquée ! Trouvez le bon étage entre " + (highestClearedLevel + 1) + " et " + (highestClearedLevel + 3) + ".";
+        roomText.textContent = "Accès refusé. Validez le palier actuel.";
         return; 
     }
 
@@ -49,45 +55,35 @@ function changeFloor(dir) {
 
     currentFloor = Math.max(0, targetFloor);
     updateDisplay();
-    roomText.textContent = "Ascenseur à l'étage " + currentFloor;
 }
 
 function toggleDoors() {
     if (gameState !== 'playing') return;
-    
+    if (currentFloor === 0) return;
+
+    if (policeTape.style.display === 'block') {
+        roomText.textContent = "Inutile d'ouvrir, c'est fini ici.";
+        return;
+    }
+
     if (!elevatorView.classList.contains('doors-open')) {
         elevatorView.classList.add('doors-open');
         playSnd('snd-doors');
         
-        setTimeout(() => {
-            checkFloor();
-        }, 800);
+        setTimeout(() => { checkFloor(); }, 800);
     }
 }
 
 function checkFloor() {
-    if (currentFloor === 0) {
-        roomText.textContent = "Rez-de-chaussée.";
-        return;
-    }
-
-    // Si on est dans un étage déjà validé par le passé
-    if (currentFloor <= highestClearedLevel) {
-        roomText.textContent = "Étage déjà exploré.";
-        return;
-    }
-
-    // On récupère quel est le bon étage pour le palier actuel (0, 3, 6...)
     const palierBase = Math.floor((currentFloor - 1) / 3) * 3;
     const correctFloor = safeFloors[palierBase];
 
     if (currentFloor === correctFloor) {
-        // VICTOIRE DU PALIER
         highestClearedLevel = palierBase + 3; 
         playSnd('snd-success');
-        roomText.textContent = "ÉTAGE SÉCURISÉ ! Le palier suivant est débloqué.";
+        roomText.textContent = "ÉTAGE CORRECT. Palier suivant débloqué.";
+        policeTape.style.display = 'block';
     } else {
-        // MONSTRE !
         triggerJumpscare();
     }
 }
@@ -103,7 +99,7 @@ function triggerJumpscare() {
         currentFloor = 0;
         updateDisplay();
         gameState = 'playing';
-        roomText.textContent = "L'ascenseur redémarre au niveau 0.";
+        roomText.textContent = "L'ascenseur est retombé au RDC...";
     }, 4000);
 }
 

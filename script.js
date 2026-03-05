@@ -2,15 +2,18 @@ let currentFloor = 0;
 let highestClearedLevel = 0;
 let gameState = 'playing';
 
-// Récupération des éléments audio
-const sndAmbiance = document.getElementById('snd-ambiance');
-const sndJumpscare = document.getElementById('snd-jumpscare');
-const sndSuccess = document.getElementById('snd-success');
-const sndDoors = document.getElementById('snd-doors');
+// Sélection des éléments
+const elevatorView = document.getElementById('elevator-view');
+const roomText = document.getElementById('room-text');
+const monsterOverlay = document.getElementById('monster-overlay');
 
-function playSound(audio) {
-    audio.currentTime = 0;
-    audio.play().catch(() => console.log("L'audio attend un clic."));
+// Gestion des sons avec sécurité
+function playSnd(id) {
+    const audio = document.getElementById(id);
+    if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(() => console.log("Son bloqué par le navigateur (cliquez d'abord sur la page)"));
+    }
 }
 
 function updateDisplay() {
@@ -19,51 +22,69 @@ function updateDisplay() {
 
 function changeFloor(dir) {
     if (gameState !== 'playing') return;
-    // Lance l'ambiance au premier mouvement
-    sndAmbiance.play();
     
+    // Fermer les portes si on bouge
+    if (elevatorView.classList.contains('doors-open')) {
+        elevatorView.classList.remove('doors-open');
+        playSnd('snd-doors');
+    }
+
+    // L'ambiance se lance au premier mouvement
+    playSnd('snd-ambiance');
+
     currentFloor = Math.max(0, currentFloor + dir);
     updateDisplay();
+    roomText.textContent = "L'ascenseur se déplace...";
 }
 
 function toggleDoors() {
     if (gameState !== 'playing') return;
-    const view = document.getElementById('elevator-view');
     
-    if (!view.classList.contains('doors-open')) {
-        view.classList.add('doors-open');
-        playSound(sndDoors);
+    if (!elevatorView.classList.contains('doors-open')) {
+        elevatorView.classList.add('doors-open');
+        playSnd('snd-doors');
         
+        // On attend que les portes soient ouvertes pour juger
         setTimeout(() => {
-            // Logique de victoire ou défaite
-            if (currentFloor === highestClearedLevel + 1 || currentFloor === 0) {
-                if (currentFloor !== 0) {
-                    highestClearedLevel = currentFloor;
-                    playSound(sndSuccess);
-                    document.getElementById('room-text').textContent = "Étage sécurisé...";
-                }
-            } else {
-                triggerJumpscare();
-            }
+            checkFloor();
         }, 1000);
+    }
+}
+
+function checkFloor() {
+    // Étage 0 ou étage déjà réussi : OK
+    if (currentFloor === 0 || currentFloor <= highestClearedLevel) {
+        roomText.textContent = "Rien ici... Tout est calme.";
+        return;
+    }
+
+    // La règle : On doit trouver l'étage juste après le dernier réussi
+    if (currentFloor === highestClearedLevel + 1) {
+        highestClearedLevel = currentFloor;
+        playSnd('snd-success');
+        roomText.textContent = "Étage " + currentFloor + " sécurisé ! Continuez.";
+    } else {
+        // MAUVAIS ÉTAGE = MONSTRE
+        triggerJumpscare();
     }
 }
 
 function triggerJumpscare() {
     gameState = 'attacking';
-    const monster = document.getElementById('monster-overlay');
-    monster.classList.add('monster-attack');
+    roomText.textContent = "MAUVAIS ÉTAGE.";
     
-    playSound(sndJumpscare);
+    monsterOverlay.classList.add('monster-attack');
+    playSnd('snd-jumpscare');
     
     setTimeout(() => {
-        monster.classList.remove('monster-attack');
-        document.getElementById('elevator-view').classList.remove('doors-open');
-        playSound(sndDoors);
+        // Reset après l'attaque
+        monsterOverlay.classList.remove('monster-attack');
+        elevatorView.classList.remove('doors-open');
+        playSnd('snd-doors');
         currentFloor = 0;
         updateDisplay();
         gameState = 'playing';
-        document.getElementById('room-text').textContent = "L'ascenseur redémarre...";
+        roomText.textContent = "L'ascenseur redémarre au rez-de-chaussée...";
     }, 3000);
 }
 

@@ -90,3 +90,4 @@ function triggerJumpscare() {
 }
 
 updateDisplay();
+
